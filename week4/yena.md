@@ -49,7 +49,7 @@ public enum RoleType {
 ```
 
 1. @Enumerated: 자바의 enum 사용.
-2. @Teamporal: 자바의 날짜 타입 사용
+2. @Teamporal: 자바의 날짜 타입 사용.
 3. @Lob: DB의 clob, blob 타입 매핑할 수 있음.
 
 ## 데이터베이스 스키마 자동 생성
