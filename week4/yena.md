@@ -62,7 +62,7 @@ JPA는 매핑정보와 데이터베이스 방언을 사용해서 데이터베이
 
 `<property name="hibernate.hbm2ddl.auto" value="creaste" />`
 
-이 속성을 추가하면 애플레케이션 실행 시점에 DB 테이블을 자동으로 생성한다.
+이 속성을 추가하면 애플리케이션 실행 시점에 DB 테이블을 자동으로 생성한다.
 
 > `hibernate.show_sql = true` 콘솔에 실행되는 테이블 생성 DDL 출력
 
@@ -75,7 +75,7 @@ JPA는 매핑정보와 데이터베이스 방언을 사용해서 데이터베이
 private String unserName;
 ```
 
-- nulable: false로 지정하면 자동 생성되는 DDL에 not null 제약 조건 추가.
+- nullable: false로 지정하면 자동 생성되는 DDL에 not null 제약 조건 추가.
 - length: 자동 생성되는 DDL에 문자 크기 지정
 
 #### 유니크 제약조건 - @Table의 uniqueConstraints 속성
@@ -237,7 +237,7 @@ DB 방언에 따라 IDENTITY, SEQUENCE, TABLE 전략 중 하나를 자동으로 
 - 자연 키(natural key): 비즈니스에 의미 있는 키(주민번호, 이메일, 전화번호)
 - 대리 키(surrogate key), 대체 키: 비즈니스와 관련 없는 임의로 만들어진 키(오라클 시퀀스, auto_increment, 키생성 테이블 사용)
 
-자연키도 변할 수 있고, 비즈니스의 환경은 언젠가 변한다...!  
+자연키도 변할 수 있고, 비즈니스의 환경(요구사항)은 언젠가 변한다...!  
 => 자연키의 후보가 되는 컬럼들은 필요에 따라 유니크 인덱스를 설정해서 사용  
 **=> 자연키 보다 대리키 권장**
 
