@@ -22,7 +22,7 @@ ORM에서의 상속 관계 매핑은 객체의 상속 구조와 DB의 슈퍼타�
 
 #### 매핑 정보
 
-- `@Inheritance(strategy = InheritanceType.JOINED)`: 부모 클래스에 사용하는 상속 매핑. 속성 값으로 매핑 전략을 지정. `InheritanceType.JOINED`으로 조인 전략 지정.
+- `@Inheritance(strategy = InheritanceType.JOINED)`: 부모 클래스에 사용하는 상속 매핑. 속성 값으로 매핑 전략을 지정.
 - `@DiscriminatorColumn(name = "DTYPE")`: 부모 클래스에 구분 컬럼 지정. 기본값이 `DTYPE`이다.(name 속성 생략 가능)
 - `@DiscriminatorValue("M")`: 엔티티를 저장할 때 구분 컬럼에 입력할 값 지정.
 - `@PrimarykeyJoinColumn(name = "BOOK_ID")`: 필요시 자식 테이블에서 부모 테이블의 ID 컬럼명을 변경해서 사용. 기본값은 그대로 사용.
@@ -51,7 +51,7 @@ ORM에서의 상속 관계 매핑은 객체의 상속 구조와 DB의 슈퍼타�
 
 #### 매핑 정보
 
-- `@Inheritance(strategy = InheritanceType.SINGLE_TABLE)`: 부모 테이블에 상속 매핑을 단일 테이블 전략으로 지정.
+- `@Inheritance(strategy = InheritanceType.SINGLE_TABLE)`: 부모 테이블에 상속 매핑 전략을 단일 테이블 전략으로 지정.
 
 #### 장점
 
@@ -72,13 +72,11 @@ ORM에서의 상속 관계 매핑은 객체의 상속 구조와 DB의 슈퍼타�
 
 ### 구현 클래스마다 테이블 전략 Table-per-Concrete-Class Strategy
 
-자식 엔티티마다 테이블을 만든다. 자식 테이블 각각에 필요한 컬럼이 모두 있다.
-
-일반적으로 추천하지 않는 전략이다. (DB 설계자, ORM 전문가 둘 다 추천X) 조인이나 단일 테이블 전략을 고려하자.
+자식 엔티티마다 테이블을 만든다. 자식 테이블 각각에 필요한 컬럼이 모두 있다. 일반적으로 추천하지 않는 전략이다. (DB 설계자, ORM 전문가 둘 다 추천X)
 
 #### 매핑 정보
 
-- `@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)`: 부모 테이블에 상속 매핑을 단일 테이블 전략으로 지정.
+- `@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)`: 부모 테이블에 상속 매핑 전략을 단일 테이블 전략으로 지정.
 
 #### 장점
 
@@ -134,8 +132,8 @@ DB 테이블 사이 관계는 외래 키가 기본 키에 포함되는지 여부
 - **필수적 비식별 관계(Mandatory)**: 외래키에 NULL 허용 않음. 연관관계를 필수적으로 맺음.
 - **선택적 비식별 관계(Optional)**: 외래키에 NULL 허용. 연관관계를 맺을지 말지 선택 가능.
 
--> JPA 둘 다 지원  
--> 비식별 관계를 주로 사용하고 꼭 필요한 곳에만 식별 관계를 사용
+-> JPA는 둘 다 지원  
+**=> 비식별 관계를 주로 사용하고 꼭 필요한 곳에만 식별 관계를 사용**
 
 ### 복합 키: 비식별 관계 매핑
 
@@ -215,9 +213,9 @@ public class Child {
   @ManyToOne
   @JoinColumns({
     @JoinColumn(name = "PARENT_ID1",
-      referenceColumnName = "PARENT_ID1"),
+      referencedColumnName = "PARENT_ID1"),
     @JoinColumn(name = "PARENT_ID2",
-      referenceColumnName = "PARENT_ID2"),
+      referencedColumnName = "PARENT_ID2"),
   })
   private Parent parent;
 }
@@ -225,7 +223,7 @@ public class Child {
 
 부모 클래스의 기본 키 컬럼이 복합 키이므로 자식 테이블의 외래 키도 복합키다. 외래키 매핑 시 여러 컬럼 매핑 위해 `@JoinColumns`사용.
 
-`@JoinColumn`의 `name`속성과 `referenceColumnName`속성 값이 같으면 `referenceColumnName`는 생략 가능.
+`@JoinColumn`의 `name`속성과 `referencedColumnName`속성 값이 같으면 `referencedColumnName`는 생략 가능.
 
 #### `@IdClass`사용 시 식별자 클래스 조건
 
@@ -236,10 +234,12 @@ public class Child {
 
 #### `@IdClass`로 지정한 복합키 사용하기
 
-**저장**: 매핑한 복합키를 사용해 저장하면 영속성 컨텍스트에 엔티티를 등록하기 직전에 **내부에서** 식별자값이 될 필드 값(Parent.id1,id2)을 사용해 **식별자 클래스(ParentId)를 생성**하고 영속성 컨텍스트의 키로 사용한다.
+**저장**: 매핑한 복합키를 사용해 저장하면 영속성 컨텍스트에 엔티티를 등록하기 직전에 **내부에서** 식별자값이 될 필드 값(Parent.id1, Parent.id2)을 사용해 **식별자 클래스(ParentId)를 생성**하고 영속성 컨텍스트의 키로 사용한다.
 
 `parent.setId1("myId1")`  
-`parent.setId1("myId2")`
+`parent.setId1("myId2")`  
+...  
+`em.persist(parent);`
 
 **조회**: 식별자 클래스를 사용해 엔티티를 조회한다.
 
@@ -279,9 +279,6 @@ public class ParentId implements Serializable {
   @Column(name = "PARENT_ID2")
   private String id2;
 
-  public ParentId() {
-  }
-
   //생성자
   ...
 
@@ -303,7 +300,9 @@ public class ParentId implements Serializable {
 **저장**: **식별자 클래스를 직접 생성**해서 사용한다.
 
 `ParentId parentId = new ParentId("myId1", "myId2")`  
-`parent.setId(parentId)`
+`parent.setId(parentId)`  
+...  
+`em.persist(parent)`
 
 **조회**: 식별자 클래스를 직접 사용해 조회한다._(`@IdClass`와 동일)_
 
@@ -329,9 +328,101 @@ public class ParentId implements Serializable {
 
 ### 복합 키: 식별 관계 매핑
 
+식별 관계에서 자식 테이블은 부모 테이블의 기본 키를 포함해 기본 키를 구성해야 하므로 `@Idclass`나 `@EmbeddedId`를 사용해 식별자를 매핑한다.
+
+부모, 자식, 손자까지 계속 기본 키를 전달한다.
+
+#### `@IdClass`와 식별 관계
+
+식별 관계는 기본 키와 외래 키를 같이 매핑. -> 식별자 매핑 `@Id`와 연관관계 매핑 `@ManyToOne`같이 사용
+
+#### `@EmbeddedId`와 식별 관계
+
+`@EmbeddedId`로 식별 관계를 구성할 때는 식별 관계로 사용할 연관관계의 속성에 `@Id`대신에 `@MapsId`를 사용해야 한다. _(부모의 PK 컬럼을 ID로 지정)_
+
+`@MapsId`는 **외래키와 매핑한 연관관계를 기본 키에도 매핑**하겠다는 뜻이다. 속성 값은 `@EmbeddedId`를 사용한 식별자 클래스의 기본 키 필드를 지정.
+
+**Child 클래스**
+
+```java
+@Entity
+public class Child {
+
+  @EmbeddedId
+  private ChildId id;
+
+  @MapsId("parentId") //ChildId.parentId 매핑
+  @ManyToOne
+  @JoinColumn(name = "PARENT_ID")
+  public Parent parent;
+
+  private String name;
+  ...
+}
+```
+
+**Child Id 클래스**
+
+```java
+@Embeddable
+public class ChildId implements Serializable {
+
+  private String parentId; //@MapsId("parentId")로 매핑
+
+  @Column(name = "CHILD_ID")
+  private String id;
+
+  //equals, hashCode
+  ...
+}
+```
+
 ### 비식별 관계로 구현
 
+매핑도 쉽고 코드도 단순하다. 복합 키가 없기 때문에 별도의 복합 키 클래스를 만들지 않아도 된다.
+
 ### 일대일 식별 관계
+
+일대일 식별 관계는 자식 테이블의 기본 키 값으로 부모 테이블의 기본 키 값을 사용한다. 그래서 부모 테이블의 기본 키가 복합 키X -> 자식 테이블 기본 키도 복합 키 구성X.
+
+식별자가 단순히 컬럼 하나면 `@MapsId`를 사용하고 속성 값은 비워두면 된다. _(`@MapsId`는 `@Id`를 사용해 식별자로 지정한 필드와 매핑)_
+
+**부모**
+
+```java
+@Entity
+public class Board {
+
+  @Id @GeneratedValue
+  @Column(name = "BOARD_ID")
+  private Long id;
+
+  private String title;
+
+  @OneToOne(mappedBy = "board")
+  private BoardDetail boardDetail;
+  ...
+}
+```
+
+**자식**
+
+```java
+@Entity
+public class BoardDetail {
+
+  @Id
+  private Long boardId;
+
+  @MapsId //BoardDetail.boardId와 매핑
+  @OneToOne
+  @joinColumn(name = "BOARD_ID")
+  private Board board;
+
+  private String content;
+  ...
+}
+```
 
 ### 식별, 비식별 관계의 장단점
 
@@ -345,7 +436,7 @@ public class ParentId implements Serializable {
 객체 관계 매핑의 관점에서 보는 비식별 관계를 선호하는 이유.
 
 - 일대일 관계를 제외하고 식별 관계는 복합 기본 키를 사용한다. JPA에서는 별도의 복합 키 클래스가 필요하다.
-- 비식별 관계의 기본 키는 주로 대리 키를 사용하는데 JPA는 `@GenerateValue`와 같은 대리키 생성을 위한 편리한 방법을 제공한다.
+- 비식별 관계의 기본 키는 주로 대리 키를 사용하는데 JPA는 `@GeneratedValue`와 같은 대리키 생성을 위한 편리한 방법을 제공한다.
 
 식별 관계의 장점
 
@@ -368,7 +459,7 @@ public class ParentId implements Serializable {
 
 조인 테이블을 사용하면 관리할 테이블이 늘어나고 연관된 두 테이블을 조인하려면 조인 테이블까지 추가로 조인해야 한다.
 
--> 기본은 조인 컬럼을 사용하고 필요시 조인 테이블 사용
+**=> 기본은 조인 컬럼을 사용하고 필요시 조인 테이블 사용**
 
 - 객체와 테이블을 매핑할 때 조인 컬럼은 `@joinColumn`으로 매핑하고, 조인 테이블은 `@JoinTable`로 매핑한다.
 - 조인 테이블은 주로 다대다 관계를 일대다, 다대다 관계로 풀어낼 때 사용한다.
@@ -390,5 +481,4 @@ public class ParentId implements Serializable {
 - `@SecondaryTable.name`: 매핑할 다른 테이블의 이름.
 - `@SecondaryTable.pkJoinColumns`: 매핑할 다른 테이블의 기본 키 컬럼 속성.
 
-필드에 테이블을 지정 않으면 기본 테이블에 매핑된다.  
-더 많은 테이블을 매핑하려면 `@SecondaryTables`를 사용.
+필드에 테이블을 지정 않으면 기본 테이블에 매핑된다. 더 많은 테이블을 매핑하려면 `@SecondaryTables`를 사용.
